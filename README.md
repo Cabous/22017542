@@ -10,16 +10,6 @@ library(dplyr)
 library(ggplot2)  
  
 library(RColorBrewer) 
-library(hrbrthemes) 
-```
-
-    ## NOTE: Either Arial Narrow or Roboto Condensed fonts are required to use these themes.
-
-    ##       Please use hrbrthemes::import_roboto_condensed() to install Roboto Condensed and
-
-    ##       if Arial Narrow is not on your system, please see https://bit.ly/arialnarrow
-
-``` r
 library(lubridate)  
 library(xts)    
 ```
