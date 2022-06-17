@@ -78,7 +78,7 @@ link-citations: TRUE            # This creates dynamic links to the papers in re
 #    - \usepackage{colortbl} # Add additional packages here.
 
 output:
-  pdf_document:
+  html_document:
     keep_tex: TRUE
     template: Tex/TexDefault.txt
     fig_width: 3.5 # Adjust default figure sizes. This can also be done in the chunks of the text.
