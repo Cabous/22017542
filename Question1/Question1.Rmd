@@ -78,7 +78,7 @@ link-citations: TRUE            # This creates dynamic links to the papers in re
 #    - \usepackage{colortbl} # Add additional packages here.
 
 output:
-  html_document:
+  pdf_document:
     keep_tex: TRUE
     template: Tex/TexDefault.txt
     fig_width: 3.5 # Adjust default figure sizes. This can also be done in the chunks of the text.
@@ -100,9 +100,19 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width 
 
 if(!require("tidyverse")) install.packages("tidyverse")
 library(tidyverse)
+library(dplyr)  
+library(ggplot2)  
+install.packages("rworldmap"); library(rworldmap) 
+library(RColorBrewer) 
+library(hrbrthemes) 
+library(lubridate)  
+install.packages("dygraphs");library(dygraphs) 
+library(xts)    
+install.packages("gganimate");library(gganimate) 
 
-list.files('code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+list.files('C:/Users/Cabous/OneDrive/Desktop/22017542/Question1/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
 
+Covid_19 <- Data(Datroot = "data/Covid/owid-covid-data.csv")
 
 
 ```
@@ -113,6 +123,39 @@ list.files('code/', full.names = T, recursive = T) %>% as.list() %>% walk(~sourc
 <!-- ############################## -->
 
 # Introduction \label{Introduction}
+
+An interesting graph would be a graph showing the total number of cases per month, grouped by continent. We have to transform our dataset, so that it is grouped by month and continent.
+
+
+```{r}
+plot_comparison <- compare_3year_trend(df = Covid_19, Datesel = ymd(20200101), NYears = 3)
+
+g_total_cases
+
+```
+
+
+total deaths
+```{r}
+plot_comparison <- compare_3year_trend(df = Covid_19, Datesel = ymd(20200101), NYears = 3)
+
+g_total_deaths
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
