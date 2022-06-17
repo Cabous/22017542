@@ -4,18 +4,27 @@ output:
     variant: markdown_github
 ---
 
-# Purpose
-
-
-
+# Data Science Practical Test
 
 ```{r}
 
-gc() # garbage collection - It can be useful to call gc after a large object has been removed, as this may prompt R to return memory to the operating system.
+gc() # garbage collection 
 library(pacman)
 p_load(tidyverse, lubridate)
+if(!require("tidyverse")) install.packages("tidyverse")
+library(tidyverse)
+library(dplyr)  
+library(ggplot2)  
+install.packages("rworldmap"); library(rworldmap) 
+library(RColorBrewer) 
+library(hrbrthemes) 
+library(lubridate)  
+install.packages("dygraphs");library(dygraphs) 
+library(xts)    
+install.packages("gganimate");library(gganimate) 
 
-list.files('Question1/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+list.files('C:/Users/Cabous/OneDrive/Desktop/22017542/Question1/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+
 
 ```
 
@@ -25,29 +34,61 @@ list.files('Question1/code/', full.names = T, recursive = T) %>% as.list() %>% w
 
 ```{r}
 
-
+Covid_19 <- Data(Datroot = "C:/Users/Cabous/OneDrive/Desktop/22017542/Question1/data/Covid/owid-covid-data.csv")
 
 ```
 
 #### First plot
 
-I can describe this plot as follows...
+An interesting graph would be a graph showing the total number of cases per month, grouped by continent. We have to transform our dataset, so that it is grouped by month and continent.
 
-It shows that ....
 
-For the below, I had to adjust the sizes to fit into the readme a bit.
 
 ```{r}
 
+plot_comparison <- compare_3year_trend(df = Covid_19, Datesel = ymd(20200101), NYears = 3)
 
+g_total_cases
 
 ```
 
 The second plot in the paper ...
 
 ```{r}
- 
+plot_comparison <- compare_3year_trend(df = Covid_19, Datesel = ymd(20200101), NYears = 3)
+
+g_total_deaths 
 ```
+The second plot in the paper ...
+
+```{r}
+Covid_19 %>% 
+    
+    ggplot() + 
+    
+    geom_line(aes(x = date, y = weekly_icu_admissions_per_million, color = continent), alpha = 0.8, 
+              size = 1)
+```
+
+```{r}
+Covid_19 %>% 
+    
+    ggplot() + 
+    
+    geom_line(aes(x = date, y = people_fully_vaccinated_per_hundred, color = continent), alpha = 0.8, 
+              size = 1)
+
+#As the majority of people became fully vaccinated around middle 2021,
+#icu admissions declined sharply this led icu amissions
+```
+
+As the majority of people became fully vaccinated around middle 2021,
+icu admissions declined sharply this led icu amissions
+
+
+
+
+
 
 
 ### Question 2
