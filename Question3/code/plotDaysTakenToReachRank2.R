@@ -3,6 +3,12 @@ plotDaysTakenToReachRank2 <- function(data, ranking = 1,col1="#a3c4dc",col2="#0e
     library(lubridate)
     options(dplyr.summarise.inform=F)
 
+    silentread <- function(x){
+        hushread <- purrr::quietly(read_csv)
+        df <- hushread(x)
+        df$result
+    }
+
     df <- rankings %>% select(player, ranking_date, rank) %>%
         mutate(player = ifelse(player %in% c("Roger Federer", "Rafael Nadal", "Novak Djokovic", "Andy Murray"),paste0(player, "*"),player)) %>%
         mutate(ranking_date = as.Date(ranking_date)) %>%

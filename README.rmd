@@ -162,7 +162,11 @@ For some reason I had some trouble loading in the data from the files provided. 
 
 ```{r}
 ## Import Match Data
-
+silentread <- function(x){
+        hushread <- purrr::quietly(read_csv)
+        df <- hushread(x)
+        df$result
+    }
 data <- read_csv('https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_1968.csv')
 
 for (i in 1969:2020) {
@@ -226,7 +230,115 @@ plotTimeTaken
 Measured in days, Roger Federer climbed the fastest up the rankings, reaching TOP1 just after 602 days. The second fastest was Iven Lendl. Third is Djokovic with 1568 days. It took Nadal the longer to become number 1 in men’s tennis. As the chart helps us to set in the timeline, we might see that it might be because of overlapping climbing periods with Djokovic. Findings like this make us aware that we also need to consider other players’ development when assessing a player and regrets me to inform Reddit that Nadal may not be better in light of the data I have.
 
 
+### Question 5
+
+```{r}
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+library(forcats)
+library(ggthemes)
+library(extrafont)
+
+list.files('C:/Users/Cabous/OneDrive/Desktop/22017542/Question5/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+
+googleplaystore <- Read_Data(Datroot = "C:/Users/Cabous/OneDrive/Desktop/22017542/Question5/data/googleplay/googleplaystore.csv")
+
+```
+
+## Data Wrangling
+Transform
+
+```{r}
+str(googleplaystore)
+googleplaystore$App <- as.character(googleplaystore$App)
+googleplaystore$Reviews <- as.numeric(googleplaystore$Reviews)
+googleplaystore$Size <- gsub("M", "", googleplaystore$Size)
+googleplaystore$Size <- ifelse(grepl("k", googleplaystore$Size), 0, as.numeric(googleplaystore$Size))
+googleplaystore$Installs <- gsub("\\+", "", as.character(googleplaystore$Installs))
+googleplaystore$Installs <- as.numeric(gsub(",", "", googleplaystore$Installs))
+googleplaystore$Price <- as.numeric((gsub("\\$", "", as.character(googleplaystore$Price))))
+#googleplaystore$Last.Updated <- mdy(googleplaystore$Last.Updated)
+#googleplaystore$Year.Updated <- year(googleplaystore$Last.Updated)
+#googleplaystore$Month.Updated <- month(googleplaystore$Last.Updated)
+googleplaystore[,c(12:13)] <- NULL #removing Current.Ver and Android.Ver
+
+googleplaystore <- googleplaystore[googleplaystore$Type %in% c("Free", "Paid"),] #removing "0" and "NaN" Type
+#googleplaystore$Type <- droplevels(googleplaystore$Type)
+
+str(googleplaystore)
+
+```
+### Duplicated data checking
+duplicated data:
+
+```{r}
+googleplaystore <- unique.data.frame(googleplaystore)
+
+plot(as.factor(googleplaystore$Installs))
+```
+
+###Create Install Category
+
+```{r}
+ic <- function(x) {
+    if (x < 10001){
+        x <- "Grade C"
+    }else if ( x >= 10001 & x < 1000001) {
+        x <- "Grade B"
+    }else if ( x >= 1000001 & x < 100000001) {
+        x <- "Grade A"
+    }else {
+        x <- "Grade A+"
+    }
+}
+
+googleplaystore$Install.cat <- sapply(googleplaystore$Installs, ic)
+googleplaystore$Install.cat <- factor(googleplaystore$Install.cat, levels=c("Grade C", "Grade B", "Grade A", "Grade A+"))
+head(googleplaystore) #check install category
+```
+
+### Remove/convert NA rating 
+
+```{r}
+rating.na <- googleplaystore[is.na(googleplaystore$Rating),]
+rating.na <- aggregate(App ~ Install.cat, rating.na, length)
+plot(rating.na)
+```
+
+```{r}
+googleplaystore[is.na(googleplaystore$Rating) & googleplaystore$Installs>11000,"Rating"] <- mean(googleplaystore$Rating, na.rm = TRUE)
+googleplaystore[is.na(googleplaystore$Rating)& googleplaystore$Installs<10001,"Rating"] <- 0
+colSums(is.na(googleplaystore)) #there is no more NA Rating
+```
+### Plot 1 : Category vs Rating
+
+```{r}
+
+ggplot(data=googleplaystore, aes(x = fct_rev(fct_infreq(Category))))+
+    geom_bar(fill = "chartreuse4")+
+    coord_flip()+
+    labs(title= "googleplaystore Apps Category",
+         x = "Category",
+         y = "Number of Apps")
+```
+
+As per the graph , Family Apps Category has the most number of Apps in this dataset,followed by Games and Tools
+
+### Plot 2: Category vs Installs
+Popular : Number of Installs
+
+```{r}
+googleplaystore.pop <- aggregate(Installs ~ Category, googleplaystore, sum)
+googleplaystore.pop <- googleplaystore.pop[order(googleplaystore.pop$Installs, decreasing = T),]
+googleplaystore.pop <- head(googleplaystore.pop, 10)
 
 
-
-
+ggplot(googleplaystore.pop, aes(x = reorder(Category, Installs), y = Installs)) +
+    geom_col( fill = "chartreuse4" ) +
+    coord_flip() +
+    labs(title = "Most Popular Categories", 
+         x = "Category",
+         y = "Total Number of Installs")
+```
+Not surprisingly, Games are the most popular category of Apps in Play Store. Followed by Communication and Tools.

@@ -791,7 +791,11 @@ provided. Thus, I imported the data from Jeff Sackmann’s Github.
 
 ``` r
 ## Import Match Data
-
+silentread <- function(x){
+        hushread <- purrr::quietly(read_csv)
+        df <- hushread(x)
+        df$result
+    }
 data <- read_csv('https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_1968.csv')
 ```
 
@@ -1395,3 +1399,225 @@ with Djokovic. Findings like this make us aware that we also need to
 consider other players’ development when assessing a player and regrets
 me to inform Reddit that Nadal may not be better in light of the data I
 have.
+
+### Question 5
+
+``` r
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+library(forcats)
+library(ggthemes)
+```
+
+    ## 
+    ## Attaching package: 'ggthemes'
+
+    ## The following object is masked from 'package:cowplot':
+    ## 
+    ##     theme_map
+
+``` r
+library(extrafont)
+```
+
+    ## Registering fonts with R
+
+``` r
+list.files('C:/Users/Cabous/OneDrive/Desktop/22017542/Question5/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+
+googleplaystore <- Read_Data(Datroot = "C:/Users/Cabous/OneDrive/Desktop/22017542/Question5/data/googleplay/googleplaystore.csv")
+```
+
+    ## Rows: 10054 Columns: 13
+
+    ## -- Column specification --------------------------------------------------------
+    ## Delimiter: ","
+    ## chr (11): App, Category, Size, Installs, Type, Price, Content Rating, Genres...
+    ## dbl  (2): Rating, Reviews
+    ## 
+    ## i Use `spec()` to retrieve the full column specification for this data.
+    ## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+## Data Wrangling
+
+Transform
+
+``` r
+str(googleplaystore)
+```
+
+    ## spec_tbl_df [10,054 x 13] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+    ##  $ App           : chr [1:10054] "Photo Editor & Candy Camera & Grid & ScrapBook" "U Launcher Lite – FREE Live Cool Themes, Hide Apps" "Sketch - Draw & Paint" "Pixel Draw - Number Art Coloring Book" ...
+    ##  $ Category      : chr [1:10054] "ART_AND_DESIGN" "ART_AND_DESIGN" "ART_AND_DESIGN" "ART_AND_DESIGN" ...
+    ##  $ Rating        : num [1:10054] 4.1 4.7 4.5 4.3 4.4 3.8 4.1 4.4 4.7 4.4 ...
+    ##  $ Reviews       : num [1:10054] 159 87510 215644 967 167 ...
+    ##  $ Size          : chr [1:10054] "19M" "8.7M" "25M" "2.8M" ...
+    ##  $ Installs      : chr [1:10054] "10,000+" "5,000,000+" "50,000,000+" "100,000+" ...
+    ##  $ Type          : chr [1:10054] "Free" "Free" "Free" "Free" ...
+    ##  $ Price         : chr [1:10054] "0" "0" "0" "0" ...
+    ##  $ Content Rating: chr [1:10054] "Everyone" "Everyone" "Teen" "Everyone" ...
+    ##  $ Genres        : chr [1:10054] "Art & Design" "Art & Design" "Art & Design" "Art & Design;Creativity" ...
+    ##  $ Last Updated  : chr [1:10054] "January 7, 2018" "August 1, 2018" "June 8, 2018" "June 20, 2018" ...
+    ##  $ Current Ver   : chr [1:10054] "1.0.0" "1.2.4" "Varies with device" "1.1" ...
+    ##  $ Android Ver   : chr [1:10054] "4.0.3 and up" "4.0.3 and up" "4.2 and up" "4.4 and up" ...
+    ##  - attr(*, "spec")=
+    ##   .. cols(
+    ##   ..   App = col_character(),
+    ##   ..   Category = col_character(),
+    ##   ..   Rating = col_double(),
+    ##   ..   Reviews = col_double(),
+    ##   ..   Size = col_character(),
+    ##   ..   Installs = col_character(),
+    ##   ..   Type = col_character(),
+    ##   ..   Price = col_character(),
+    ##   ..   `Content Rating` = col_character(),
+    ##   ..   Genres = col_character(),
+    ##   ..   `Last Updated` = col_character(),
+    ##   ..   `Current Ver` = col_character(),
+    ##   ..   `Android Ver` = col_character()
+    ##   .. )
+    ##  - attr(*, "problems")=<externalptr>
+
+``` r
+googleplaystore$App <- as.character(googleplaystore$App)
+googleplaystore$Reviews <- as.numeric(googleplaystore$Reviews)
+googleplaystore$Size <- gsub("M", "", googleplaystore$Size)
+googleplaystore$Size <- ifelse(grepl("k", googleplaystore$Size), 0, as.numeric(googleplaystore$Size))
+```
+
+    ## Warning in ifelse(grepl("k", googleplaystore$Size), 0,
+    ## as.numeric(googleplaystore$Size)): NAs introduced by coercion
+
+``` r
+googleplaystore$Installs <- gsub("\\+", "", as.character(googleplaystore$Installs))
+googleplaystore$Installs <- as.numeric(gsub(",", "", googleplaystore$Installs))
+googleplaystore$Price <- as.numeric((gsub("\\$", "", as.character(googleplaystore$Price))))
+#googleplaystore$Last.Updated <- mdy(googleplaystore$Last.Updated)
+#googleplaystore$Year.Updated <- year(googleplaystore$Last.Updated)
+#googleplaystore$Month.Updated <- month(googleplaystore$Last.Updated)
+googleplaystore[,c(12:13)] <- NULL #removing Current.Ver and Android.Ver
+
+googleplaystore <- googleplaystore[googleplaystore$Type %in% c("Free", "Paid"),] #removing "0" and "NaN" Type
+#googleplaystore$Type <- droplevels(googleplaystore$Type)
+
+str(googleplaystore)
+```
+
+    ## tibble [10,053 x 11] (S3: tbl_df/tbl/data.frame)
+    ##  $ App           : chr [1:10053] "Photo Editor & Candy Camera & Grid & ScrapBook" "U Launcher Lite – FREE Live Cool Themes, Hide Apps" "Sketch - Draw & Paint" "Pixel Draw - Number Art Coloring Book" ...
+    ##  $ Category      : chr [1:10053] "ART_AND_DESIGN" "ART_AND_DESIGN" "ART_AND_DESIGN" "ART_AND_DESIGN" ...
+    ##  $ Rating        : num [1:10053] 4.1 4.7 4.5 4.3 4.4 3.8 4.1 4.4 4.7 4.4 ...
+    ##  $ Reviews       : num [1:10053] 159 87510 215644 967 167 ...
+    ##  $ Size          : num [1:10053] 19 8.7 25 2.8 5.6 19 29 33 3.1 28 ...
+    ##  $ Installs      : num [1:10053] 1e+04 5e+06 5e+07 1e+05 5e+04 5e+04 1e+06 1e+06 1e+04 1e+06 ...
+    ##  $ Type          : chr [1:10053] "Free" "Free" "Free" "Free" ...
+    ##  $ Price         : num [1:10053] 0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ Content Rating: chr [1:10053] "Everyone" "Everyone" "Teen" "Everyone" ...
+    ##  $ Genres        : chr [1:10053] "Art & Design" "Art & Design" "Art & Design" "Art & Design;Creativity" ...
+    ##  $ Last Updated  : chr [1:10053] "January 7, 2018" "August 1, 2018" "June 8, 2018" "June 20, 2018" ...
+
+### Duplicated data checking
+
+duplicated data:
+
+``` r
+googleplaystore <- unique.data.frame(googleplaystore)
+
+plot(as.factor(googleplaystore$Installs))
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-18-1.png)
+
+###Create Install Category
+
+``` r
+ic <- function(x) {
+    if (x < 10001){
+        x <- "Grade C"
+    }else if ( x >= 10001 & x < 1000001) {
+        x <- "Grade B"
+    }else if ( x >= 1000001 & x < 100000001) {
+        x <- "Grade A"
+    }else {
+        x <- "Grade A+"
+    }
+}
+
+googleplaystore$Install.cat <- sapply(googleplaystore$Installs, ic)
+googleplaystore$Install.cat <- factor(googleplaystore$Install.cat, levels=c("Grade C", "Grade B", "Grade A", "Grade A+"))
+head(googleplaystore) #check install category
+```
+
+    ## # A tibble: 6 x 12
+    ##   App        Category Rating Reviews  Size Installs Type  Price `Content Rating`
+    ##   <chr>      <chr>     <dbl>   <dbl> <dbl>    <dbl> <chr> <dbl> <chr>           
+    ## 1 Photo Edi~ ART_AND~    4.1     159  19      10000 Free      0 Everyone        
+    ## 2 U Launche~ ART_AND~    4.7   87510   8.7  5000000 Free      0 Everyone        
+    ## 3 Sketch - ~ ART_AND~    4.5  215644  25   50000000 Free      0 Teen            
+    ## 4 Pixel Dra~ ART_AND~    4.3     967   2.8   100000 Free      0 Everyone        
+    ## 5 Paper flo~ ART_AND~    4.4     167   5.6    50000 Free      0 Everyone        
+    ## 6 Smoke Eff~ ART_AND~    3.8     178  19      50000 Free      0 Everyone        
+    ## # ... with 3 more variables: Genres <chr>, `Last Updated` <chr>,
+    ## #   Install.cat <fct>
+
+### Remove/convert NA rating
+
+``` r
+rating.na <- googleplaystore[is.na(googleplaystore$Rating),]
+rating.na <- aggregate(App ~ Install.cat, rating.na, length)
+plot(rating.na)
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-20-1.png)
+
+``` r
+googleplaystore[is.na(googleplaystore$Rating) & googleplaystore$Installs>11000,"Rating"] <- mean(googleplaystore$Rating, na.rm = TRUE)
+googleplaystore[is.na(googleplaystore$Rating)& googleplaystore$Installs<10001,"Rating"] <- 0
+colSums(is.na(googleplaystore)) #there is no more NA Rating
+```
+
+    ##            App       Category         Rating        Reviews           Size 
+    ##              0              0              0              0           1228 
+    ##       Installs           Type          Price Content Rating         Genres 
+    ##              0              0              0              0              0 
+    ##   Last Updated    Install.cat 
+    ##              0              0
+
+### Plot 1 : Category vs Rating
+
+``` r
+ggplot(data=googleplaystore, aes(x = fct_rev(fct_infreq(Category))))+
+    geom_bar(fill = "chartreuse4")+
+    coord_flip()+
+    labs(title= "googleplaystore Apps Category",
+         x = "Category",
+         y = "Number of Apps")
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-22-1.png)
+
+As per the graph , Family Apps Category has the most number of Apps in
+this dataset,followed by Games and Tools
+
+### Plot 2: Category vs Installs
+
+Popular : Number of Installs
+
+``` r
+googleplaystore.pop <- aggregate(Installs ~ Category, googleplaystore, sum)
+googleplaystore.pop <- googleplaystore.pop[order(googleplaystore.pop$Installs, decreasing = T),]
+googleplaystore.pop <- head(googleplaystore.pop, 10)
+
+
+ggplot(googleplaystore.pop, aes(x = reorder(Category, Installs), y = Installs)) +
+    geom_col( fill = "chartreuse4" ) +
+    coord_flip() +
+    labs(title = "Most Popular Categories", 
+         x = "Category",
+         y = "Total Number of Installs")
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-23-1.png) Not
+surprisingly, Games are the most popular category of Apps in Play Store.
+Followed by Communication and Tools.
