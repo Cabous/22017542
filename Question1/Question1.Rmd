@@ -102,13 +102,9 @@ if(!require("tidyverse")) install.packages("tidyverse")
 library(tidyverse)
 library(dplyr)  
 library(ggplot2)  
-install.packages("rworldmap"); library(rworldmap) 
-library(RColorBrewer) 
 library(hrbrthemes) 
 library(lubridate)  
-install.packages("dygraphs");library(dygraphs) 
 library(xts)    
-install.packages("gganimate");library(gganimate) 
 
 list.files('C:/Users/Cabous/OneDrive/Desktop/22017542/Question1/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
 
@@ -126,20 +122,27 @@ Covid_19 <- Data(Datroot = "data/Covid/owid-covid-data.csv")
 
 An interesting graph would be a graph showing the total number of cases per month, grouped by continent. We have to transform our dataset, so that it is grouped by month and continent.
 
+```{r}
+Covid_19$total_deaths[is.na(Covid_19$total_deaths)] <- 0
+Covid_19$total_cases[is.na(Covid_19$total_cases)] <- 0
+Covid_19$continent[Covid_19$continent==0] <- NA
+Covid_19$people_fully_vaccinated_per_hundred[is.na(Covid_19$people_fully_vaccinated_per_hundred)] <- 0
+Covid_19$weekly_icu_admissions_per_million[is.na(Covid_19$weekly_icu_admissions_per_million)] <- 0
+```
 
 ```{r}
-plot_comparison <- compare_3year_trend(df = Covid_19, Datesel = ymd(20200101), NYears = 3)
+g <- compare_3year_trend_cases(df = Covid_19, Datesel = ymd(20200101), NYears = 3)
 
-g_total_cases
+g
 
 ```
 
 
 total deaths
 ```{r}
-plot_comparison <- compare_3year_trend(df = Covid_19, Datesel = ymd(20200101), NYears = 3)
+g <- compare_3year_trend_deaths(df = Covid_19, Datesel = ymd(20200101), NYears = 3)
 
-g_total_deaths
+g
 
 ```
 
