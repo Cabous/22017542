@@ -56,15 +56,19 @@ Covid_19 <- Data(Datroot = "C:/Users/Cabous/OneDrive/Desktop/22017542/Question1/
 
 An interesting graph would be a graph showing the total number of cases
 per month, grouped by continent. We have to transform our dataset, so
-that it is grouped by month and continent.
+that it is grouped by month and continent. However, first we have to
+remove any NA values.
 
 ``` r
 Covid_19$total_deaths[is.na(Covid_19$total_deaths)] <- 0
 Covid_19$total_cases[is.na(Covid_19$total_cases)] <- 0
 Covid_19$continent[Covid_19$continent==0] <- NA
-Covid_19$people_fully_vaccinated_per_hundred[is.na(Covid_19$people_fully_vaccinated_per_hundred)] <- 0
-Covid_19$weekly_icu_admissions_per_million[is.na(Covid_19$weekly_icu_admissions_per_million)] <- 0
 ```
+
+Now we can plot the total number of cases for each continent. We see
+that African countries have reported way fewer cases relative to other
+regions, however this could be because of a lack in transparency, or
+fewer covid tests.
 
 ``` r
 g <- compare_3year_trend_cases(df = Covid_19, Datesel = ymd(20200101), NYears = 3)
@@ -74,7 +78,8 @@ g
 
 ![](README_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
-The second plot in the paper …
+The second plot looks at covid related deaths for each region. Again,
+African countries have reported fewer deaths relative to other regions.
 
 ``` r
 g <- compare_3year_trend_deaths(df = Covid_19, Datesel = ymd(20200101), NYears = 3)
@@ -82,8 +87,15 @@ g <- compare_3year_trend_deaths(df = Covid_19, Datesel = ymd(20200101), NYears =
 g
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-5-1.png) The
-second plot in the paper …
+![](README_files/figure-markdown_github/unnamed-chunk-5-1.png)
+
+The second part of Question 1 compared the relationship between weekly
+ICU admissions and vaccinations. However, first removing any NA values.
+
+``` r
+Covid_19$people_fully_vaccinated_per_hundred[is.na(Covid_19$people_fully_vaccinated_per_hundred)] <- 0
+Covid_19$weekly_icu_admissions_per_million[is.na(Covid_19$weekly_icu_admissions_per_million)] <- 0
+```
 
 ``` r
 Covid_19 %>% 
@@ -94,7 +106,7 @@ Covid_19 %>%
               size = 1)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 ``` r
 Covid_19 %>% 
@@ -105,15 +117,13 @@ Covid_19 %>%
               size = 1)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
-``` r
-#As the majority of people became fully vaccinated around middle 2021,
-#icu admissions declined sharply this led icu amissions
-```
-
-As the majority of people became fully vaccinated around middle 2021,
-icu admissions declined sharply this led icu amissions
+Ignoring the clear outlier in the ICU-admissions graph (probably due to
+an error in my code). As the majority of people became fully vaccinated
+around middle 2021, it appears that ICU admissions declined around the
+same time. This would suggest that vaccinations led to fewer ICU
+admissions.
 
 ### Question 2
 
