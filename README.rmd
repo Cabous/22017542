@@ -100,42 +100,47 @@ Ignoring the clear outlier in the ICU-admissions graph (probably due to an error
 ### Question 2
 
 ```{r}
+if(!require("tidyverse")) install.packages("tidyverse")
+library(tidyverse)
+library(dplyr)  
+library(ggplot2) 
+
+list.files('C:/Users/Cabous/OneDrive/Desktop/22017542/Question2/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+
+ # Load data
+London_weather <- Data_source(Datroot = "C:/Users/Cabous/OneDrive/Desktop/22017542/Question2/data/London/london_weather.csv")
 
 ```
-
-
 
 ### First plot
 
-Some description here would be great.
+In my analysis, the maximum temperature recorded was between 10 and 15 Celsius, which is relatively cold compared to Cape Town (mean of 20).
 
 ```{r}
 
-```
-
-
-
-### Table
-
-
-
-
-```{r, message=FALSE}
+hist(London_weather$max_temp,breaks = 13, col = "blue", main = "Maximum temperature")
 
 ```
-
-
-
 ### Second plot
 
+According to the second plot, London only has a lot days with less than 3 hours of sunshine. Thus, in order to persuade her to stay I would certainly mention this point.
+
+```{r, message=FALSE}
+
+hist(London_weather$sunshine ,breaks = 10, col = "yellow", main = "Hours of sunshine per day")
+
+```
+
+
+
+### Question 3
+
 ```{r, message=FALSE}
 
 ```
 
 
-### Regression plot
 
-Short overview
 
 ```{r, message=FALSE}
 

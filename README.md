@@ -127,14 +127,46 @@ admissions.
 
 ### Question 2
 
+``` r
+if(!require("tidyverse")) install.packages("tidyverse")
+library(tidyverse)
+library(dplyr)  
+library(ggplot2) 
+
+list.files('C:/Users/Cabous/OneDrive/Desktop/22017542/Question2/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+
+ # Load data
+London_weather <- Data_source(Datroot = "C:/Users/Cabous/OneDrive/Desktop/22017542/Question2/data/London/london_weather.csv")
+```
+
+    ## Rows: 15341 Columns: 10
+    ## -- Column specification --------------------------------------------------------
+    ## Delimiter: ","
+    ## dbl (10): date, cloud_cover, sunshine, global_radiation, max_temp, mean_temp...
+    ## 
+    ## i Use `spec()` to retrieve the full column specification for this data.
+    ## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
 ### First plot
 
-Some description here would be great.
+In my analysis, the maximum temperature recorded was between 10 and 15
+Celsius, which is relatively cold compared to Cape Town (mean of 20).
 
-### Table
+``` r
+hist(London_weather$max_temp,breaks = 13, col = "blue", main = "Maximum temperature")
+```
 
-### Second plot
+![](README_files/figure-markdown_github/unnamed-chunk-10-1.png) \###
+Second plot
 
-### Regression plot
+According to the second plot, London only has a lot days with less than
+3 hours of sunshine. Thus, in order to persuade her to stay I would
+certainly mention this point.
 
-Short overview
+``` r
+hist(London_weather$sunshine ,breaks = 10, col = "yellow", main = "Hours of sunshine per day")
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-11-1.png)
+
+### Question 3
