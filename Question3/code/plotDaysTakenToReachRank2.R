@@ -1,6 +1,7 @@
 
 plotDaysTakenToReachRank2 <- function(data, ranking = 1,col1="#a3c4dc",col2="#0e668b") {
     library(lubridate)
+    options(dplyr.summarise.inform=F)
 
     df <- rankings %>% select(player, ranking_date, rank) %>%
         mutate(player = ifelse(player %in% c("Roger Federer", "Rafael Nadal", "Novak Djokovic", "Andy Murray"),paste0(player, "*"),player)) %>%
@@ -69,6 +70,6 @@ plotDaysTakenToReachRank2 <- function(data, ranking = 1,col1="#a3c4dc",col2="#0e
         theme_minimal()
 
 }
-plotDaysTakenToReachRank2(rankings,ranking = 1)
+
 
 

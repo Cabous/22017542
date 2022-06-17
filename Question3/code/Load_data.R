@@ -21,13 +21,13 @@ rankings <- rbind(rankings, rankings_80s, rankings_90s, rankings_00s, rankings_1
 rm(rankings_80s, rankings_90s, rankings_00s, rankings_10s, rankings_20s)
 
 
-## players - needed mostly for exacting the players' date of birth (retrieved 3.01.2020 at 21:54 CET)
+## players - needed mostly for exacting the players' date of birth
 
 players <- read_csv('https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_players.csv',
                     col_names = c("player_id", "first_name", "last_name", "hand", "birth_date", "country_code"))
 
 
-#### data preprocessing ####
+#### data preprocessing
 
 ## We will need to change the date format (in all of the data frames).
 ## We will also unify the naming conventions, making `player_id` stand for player ID, and `player`
@@ -53,11 +53,3 @@ rankings %<>%
 
 
 
-#library(dplyr)
-#rankings <-
-  #  list.files(path = "c:/Users/Cabous/OneDrive/Desktop/22017542/Question3/data/Tennis/",
- #              pattern = "*0s.csv",
- #              full.names = T) %>%
- #   map_df(~read_csv(., col_types = cols(.default = "c")))
-
-#players <- read_csv("data/Tennis/atp_players.csv")
